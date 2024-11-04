@@ -34,10 +34,10 @@ pipeline {
                 echo 'gradle Build'
                  sh """
                      cd ./project_DiB
-                     chmod +x ./gradlew
-                     ./gradlew build -x test
+                     chmod +x gradlew
+                     gradlew build -x test
                  """
-       }
+           }
         }
         
         stage('Docker Image Build') {
