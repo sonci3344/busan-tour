@@ -32,10 +32,10 @@ pipeline {
         stage('gradle Build') {
             steps {
                 echo 'gradle Build'
-        sh """
-                     cd ./project_DiB
-           chmod +x ./gradlew
-                    ./gradlew build -x test
+                  sh """
+                      cd ./project_DiB
+                      chmod +x ./gradlew
+                     ./gradlew build -x test
                  """
        }
         }
