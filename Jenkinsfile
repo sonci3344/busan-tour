@@ -37,9 +37,8 @@ pipeline {
                       chmod +x ./gradlew
                      ./gradlew build -x test
                  """
-       }
-        }
-        
+               }
+            }
         stage('Docker Image Build') {
             steps {
                 echo 'Docker Image build'                
