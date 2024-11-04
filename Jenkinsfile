@@ -33,7 +33,7 @@ pipeline {
             steps {
                 echo 'gradle Build'
                  sh """
-                     cd ./Project_DiB
+                     cd ./project_DiB
                      chmod +x gradlew
                      gradlew build -x test
                  """
