@@ -32,13 +32,14 @@ pipeline {
         stage('gradle Build') {
             steps {
                 echo 'gradle Build'
-                  sh """
-                      cd ./project_DiB
-                      chmod +x ./gradlew
-                     ./gradlew build -x test
+                 sh """
+                     cd ./project_DiB
+                     chmod +x gradlew
+                    ./gradlew build -x test
                  """
-               }
-            }
+       }
+        }
+        
         stage('Docker Image Build') {
             steps {
                 echo 'Docker Image build'                
@@ -71,6 +72,52 @@ pipeline {
                   docker rmi hyunkyoungkang/busan-tour:$BUILD_NUMBER
                   docker rmi hyunkyoungkang/busan-tour:latest
               """
+            }
+        }
+        stage('Upload S3') { 
+     steps {
+              echo "upload to S3"
+              dir("${env.WORKSPACE}"){
+                sh 'zip -r deploy.zip ./deploy appspec.yml'
+                withAWS(region:"${REGION}", credentials: "${AWS_CREDENTIAL_NAME}"){
+                  s3Upload(file:"deploy.zip", bucket:"team03-bucket")
+               }
+               sh 'rm -rf ./deploy.zip'
+             }
+           }
+        }
+       stage('deploy create-application') { 
+        steps {
+                 withAWS(region:"${REGION}", credentials: "${AWS_CREDENTIAL_NAME}"){
+                   sh 'aws deploy create-application --application-name team03-deploy'
+                 }
+            }
+       }
+        stage('deploy create-deployment-group') {
+            steps {
+                 withAWS(region:"${REGION}", credentials: "${AWS_CREDENTIAL_NAME}"){
+                sh """ 
+                    aws deploy create-deployment-group \
+                        --application-name team03-deploy \
+                        --auto-scaling-groups team03_asg \
+                        --deployment-config-name CodeDeployDefault.OneAtATime \
+                        --deployment-group-name team03-deploy-group \
+                        --service-role-arn arn:aws:iam::491085389788:role/team03_CodeDeploy_Role
+                   """
+                 }
+            }
+        }
+        stage('deploy create-deployment') {
+            steps {
+                 withAWS(region:"${REGION}", credentials: "${AWS_CREDENTIAL_NAME}"){
+                sh """ 
+                    aws deploy create-deployment \
+                        --application-name team03-deploy \
+                        --deployment-config-name CodeDeployDefault.OneAtATime \
+                        --deployment-group-name team03-deploy-group \
+                        --s3-location bucket=team03-bucket,bundleType=zip,key=deploy.zip
+                   """
+                 }
             }
         }
     }
