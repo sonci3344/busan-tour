@@ -35,7 +35,7 @@ pipeline {
                  sh """
                      cd ./project_DiB
                      chmod +x ./gradlew
-                     ./gradlew build -x test
+                     gradle build -x test
                  """
            }
         }
