@@ -6,7 +6,7 @@ pipeline {
         gradle 'G3'
     }
     environment { 
-        // jenkins에 등록해 놓은 docker hub credentials 이름
+       
         DOCKERHUB_CREDENTIALS = credentials('dockerCredentials') 
         REGION = 'ap-northeast-2'
         AWS_CREDENTIAL_NAME = 'AWSCredentials'
